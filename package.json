@@ -1,0 +1,31 @@
+{
+  "name": "horusec-action",
+  "version": "1.0.0",
+  "description": "GitHub action for Horusec",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angelokurtis/horusec-action.git"
+  },
+  "keywords": [
+    "GitHub",
+    "Actions",
+    "Horusec",
+    "Security",
+    "Analysis",
+    "Vulnerabilities",
+    "Sast"
+  ],
+  "author": "Tiago Angelo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angelokurtis/horusec-action/issues"
+  },
+  "homepage": "https://github.com/angelokurtis/horusec-action#readme",
+  "dependencies": {
+    "@actions/core": "^1.4.0"
+  }
+}
