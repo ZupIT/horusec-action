@@ -1,5 +1,10 @@
 name: 'Horusec'
 description: 'Secure Code Analysis'
+inputs:
+  github-token:
+    description: "the token is used to search the latest Horusec version"
+    default: ${{ github.token }}
+    required: true
 outputs:
   result:
     description: 'The message to output'
