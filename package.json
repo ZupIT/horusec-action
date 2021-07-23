@@ -2,7 +2,7 @@
   "name": "horusec-action",
   "version": "1.0.0",
   "description": "GitHub action for Horusec",
-  "main": "index.js",
+  "main": "src/run.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/angelokurtis/horusec-action#readme",
   "dependencies": {
-    "@actions/core": "^1.4.0"
+    "@actions/core": "^1.4.0",
+    "@actions/github": "^5.0.0",
+    "process": "^0.11.10"
   }
 }
