@@ -1,0 +1,88 @@
+name: 'Horusec'
+description: 'Secure Code Analysis'
+inputs:
+  github-token:
+    description: "the token is used to search the latest Horusec version"
+    default: ${{ github.token }}
+    required: true
+  ignore:
+    description: "Paths to ignore in the analysis"
+    required: false
+  project-path:
+    description: "Path to run an analysis in your project"
+    default: "./"
+    required: false
+  output-format:
+    description: "The format for the output to be shown"
+    default: "json"
+    required: false
+  analysis-timeout:
+    description: "The timeout threshold for the Horusec CLI wait for the analysis to complete"
+    required: false
+  authorization:
+    description: "The authorization token for the Horusec API"
+    required: false
+  certificate-path:
+    description: "Path to certificate of authority"
+    required: false
+  container-bind-project-path:
+    description: "Used to pass project path in host when running horusec cli inside a container"
+    required: false
+  custom-rules-path:
+    description: "Used to pass the path to the horusec custom rules file"
+    required: false
+  disable-docker:
+    description: "Used to run horusec without docker if enabled it will only run the following tools: horusec-csharp, horusec-kotlin, horusec-kubernetes, horusec-leaks, horusec-nodejs"
+    required: false
+  enable-commit-author:
+    description: "Used to enable or disable search with vulnerability author"
+    required: false
+  enable-git-history:
+    description: "When this value is 'true' we will run tool gitleaks and search vulnerability in all git history of the project"
+    required: false
+  false-positive:
+    description: "Used to ignore a vulnerability by hash and setting it to be of the false positive type"
+    required: false
+  filter-path:
+    description: "Filter the path to run the analysis"
+    required: false
+  headers:
+    description: "The headers dynamic to send on request in Horusec API"
+    required: false
+  horusec-url:
+    description: "The Horusec API address to access the analysis engine"
+    required: false
+  ignore-severity:
+    description: "The level of vulnerabilities to ignore in the output"
+    required: false
+  information-severity:
+    description: "Used to enable or disable information severity vulnerabilities, information vulnerabilities can contain a lot of false positives"
+    required: false
+  insecure-skip-verify:
+    description: "Insecure skip verify cert authority"
+    required: false
+  monitor-retry-count:
+    description: "The number of retries for the monitor"
+    required: false
+  repository-name:
+    description: "Used to send repository name to horus server"
+    required: false
+  request-timeout:
+    description: "The timeout threshold for the request to the Horusec API"
+    required: false
+  return-error:
+    description: "The return-error is the option to check if you can return 'exit(1)' if found vulnerabilities"
+    required: false
+  risk-accept:
+    description: "Used to ignore a vulnerability by hash and setting it to be of the risk accept type"
+    required: false
+  tools-ignore:
+    description: "Tools to ignore in the analysis"
+    required: false
+
+outputs:
+  result:
+    description: 'The message to output'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
