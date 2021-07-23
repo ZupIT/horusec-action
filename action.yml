@@ -1,0 +1,8 @@
+name: 'Horusec'
+description: 'Secure Code Analysis'
+outputs:
+  result:
+    description: 'The message to output'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
