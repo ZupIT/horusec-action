@@ -16,7 +16,15 @@ async function run() {
 
     const output = './result.json'
     await exec(`${executable} start ${flags.join(' ')} -json-output-file="${output}" --output-format="json"`)
-    return fs.readFileSync(output);
+
+    // Output prettified JSON.
+    console.log("::group::Output JSON")
+    let rawdata = fs.readFileSync(output);
+    let result = JSON.parse(rawdata);
+    console.log(JSON.stringify(result, null, 2));
+    console.log("::endgroup::")
+
+    return result;
 }
 
 run()

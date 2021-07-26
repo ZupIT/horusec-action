@@ -6126,6 +6126,56 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 96:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+const core = __nccwpck_require__(186);
+const github = __nccwpck_require__(438);
+const fs = __nccwpck_require__(747);
+const http = __nccwpck_require__(211);
+const {platform, arch} = __nccwpck_require__(765);
+
+function download(url, path) {
+    const file = fs.createWriteStream(path)
+    return new Promise(resolve => {
+        function get(url, file) {
+            http.get(url, (response) => {
+                if (response.statusCode === 302) get(response.headers.location, file)
+                else response.pipe(file).on("finish", resolve)
+            })
+        }
+
+        get(url, file)
+    })
+}
+
+module.exports = async function () {
+    const token = core.getInput(`github-token`, {required: true});
+    const {rest: {repos}} = github.getOctokit(token)
+
+    const owner = "ZupIT"
+    const repo = "horusec"
+
+    const {data: {name, assets, created_at}} = await repos.getLatestRelease({owner, repo});
+    core.info(`Using ${name} released at ${created_at}`)
+
+    const asset = assets.find(({name}) => name.includes(`${platform}_${arch}`))
+    if (!asset) {
+        throw new Error(`No binary for ${platform}_${arch}`)
+    }
+    core.info(`Found binary '${asset.name}' for current platform`)
+
+    const executable = `./${asset.name}`;
+    const start = new Date();
+    await download(asset.browser_download_url, executable)
+    fs.chmodSync(executable, 0o755);
+    core.info(`Downloaded in ${(new Date() - start) / 1000}s`)
+
+    return executable
+}
+
+/***/ }),
+
 /***/ 877:
 /***/ ((module) => {
 
@@ -6139,6 +6189,14 @@ module.exports = eval("require")("encoding");
 
 "use strict";
 module.exports = require("assert");
+
+/***/ }),
+
+/***/ 129:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("child_process");
 
 /***/ }),
 
@@ -6288,27 +6346,32 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(186);
-const github = __nccwpck_require__(438);
-const {platform, arch} = __nccwpck_require__(765);
+const {promisify} = __nccwpck_require__(669);
+
+const fs = __nccwpck_require__(747);
+const subprocesses = __nccwpck_require__(129);
+const exec = promisify(subprocesses.exec)
+
+const download = __nccwpck_require__(96);
 
 async function run() {
-    const token = core.getInput(`github-token`, {required: true});
-    const {rest: {repos}} = github.getOctokit(token)
+    const executable = await download()
+    const flags = [`-p="${core.getInput('project-path')}"`]
 
-    const owner = "ZupIT"
-    const repo = "horusec"
+    const ignore = core.getInput('ignore');
+    if (ignore) flags.push(`-i="${ignore}"`)
 
-    const {data: {name, assets, created_at}} = await repos.getLatestRelease({owner, repo});
-    core.info(`Using ${name} released at ${created_at}`)
+    const output = './result.json'
+    await exec(`${executable} start ${flags.join(' ')} -json-output-file="${output}" --output-format="json"`)
 
-    const asset = assets.find(({name}) => name.includes(`${platform}_${arch}`))
-    if (!asset) {
-        throw new Error(`No binary for ${platform}_${arch}`)
-    }
-    core.info(`Found binary '${asset.name}' for current platform`)
+    // Output prettified JSON.
+    console.log("::group::Output JSON")
+    let rawdata = fs.readFileSync(output);
+    let result = JSON.parse(rawdata);
+    console.log(JSON.stringify(result, null, 2));
+    console.log("::endgroup::")
 
-    delete asset.uploader
-    return asset
+    return result;
 }
 
 run()
