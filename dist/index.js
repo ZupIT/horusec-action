@@ -6176,6 +6176,28 @@ module.exports = async function () {
 
 /***/ }),
 
+/***/ 833:
+/***/ ((module) => {
+
+function convert({analysisVulnerabilities: analysis}) {
+    const diagnostics = analysis
+        .map(({vulnerabilities}) => vulnerabilities)
+        .flat()
+        .map(({details, file, line, column, severity}) => {
+            const vulnerability = {message: details, severity: severity};
+            if (file) vulnerability.location = {
+                path: file,
+                range: {start: {line: parseInt(line), column: parseInt(column)}}
+            }
+            return vulnerability
+        })
+    return {source: {name: 'Horusec', url: 'https://horusec.io/'}, diagnostics}
+}
+
+module.exports = {convert}
+
+/***/ }),
+
 /***/ 877:
 /***/ ((module) => {
 
@@ -6353,6 +6375,7 @@ const subprocesses = __nccwpck_require__(129);
 const exec = promisify(subprocesses.exec)
 
 const download = __nccwpck_require__(96);
+const reviewdog = __nccwpck_require__(833);
 
 async function run() {
     const executable = await download()
@@ -6364,10 +6387,12 @@ async function run() {
     const output = './result.json'
     await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
 
+    const rawdata = fs.readFileSync(output);
+    let result = JSON.parse(rawdata);
+    if (core.getInput('output-format') === 'reviewdog') result = reviewdog.convert(result)
+
     // Output prettified JSON.
     console.log("::group::Output JSON")
-    let rawdata = fs.readFileSync(output);
-    let result = JSON.parse(rawdata);
     console.log(JSON.stringify(result, null, 2));
     console.log("::endgroup::")
 
