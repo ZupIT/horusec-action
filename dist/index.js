@@ -6362,7 +6362,7 @@ async function run() {
     if (ignore) flags.push(`-i="${ignore}"`)
 
     const output = './result.json'
-    await exec(`${executable} start ${flags.join(' ')} -json-output-file="${output}" --output-format="json"`)
+    await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
 
     // Output prettified JSON.
     console.log("::group::Output JSON")
