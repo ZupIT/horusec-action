@@ -20,7 +20,10 @@ async function run() {
 
     const rawdata = fs.readFileSync(output);
     let result = JSON.parse(rawdata);
-    if (core.getInput('output-format') === 'reviewdog') result = reviewdog.convert(result)
+    if (core.getInput('output-format') === 'reviewdog') {
+        result = reviewdog.convert(result)
+        fs.writeFileSync(output, result);
+    }
 
     // Output prettified JSON.
     console.log("::group::Output JSON")
