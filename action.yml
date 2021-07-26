@@ -5,6 +5,13 @@ inputs:
     description: "the token is used to search the latest Horusec version"
     default: ${{ github.token }}
     required: true
+  ignore:
+    description: "Paths to ignore in the analysis"
+    required: false
+  project-path:
+    description: "Path to run an analysis in your project"
+    default: "./"
+    required: false
 outputs:
   result:
     description: 'The message to output'

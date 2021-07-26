@@ -8,7 +8,12 @@ const download = require('./download');
 
 async function run() {
     const executable = await download()
-    await exec(`${executable} start -p="./" --ignore="**/.vscode/**, **/*.env, **/.mypy_cache/**, **/tests/**"`)
+    const flags = [`-p="${core.getInput('project-path')}"`]
+
+    const ignore = core.getInput('ignore');
+    if (ignore) flags.push(`-i="${ignore}"`)
+
+    await exec(`${executable} start ${flags.join(' ')} -json-output-file="./output.json" --output-format="json"`)
 }
 
 run()
