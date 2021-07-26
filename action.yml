@@ -12,6 +12,10 @@ inputs:
     description: "Path to run an analysis in your project"
     default: "./"
     required: false
+  output-format:
+    description: "The format for the output to be shown"
+    default: "json"
+    required: false
 outputs:
   result:
     description: 'The message to output'

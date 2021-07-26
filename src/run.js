@@ -6,6 +6,7 @@ const subprocesses = require('child_process');
 const exec = promisify(subprocesses.exec)
 
 const download = require('./download');
+const reviewdog = require('./reviewdog');
 
 async function run() {
     const executable = await download()
@@ -17,10 +18,12 @@ async function run() {
     const output = './result.json'
     await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
 
+    const rawdata = fs.readFileSync(output);
+    let result = JSON.parse(rawdata);
+    if (core.getInput('output-format') === 'reviewdog') result = reviewdog.convert(result)
+
     // Output prettified JSON.
     console.log("::group::Output JSON")
-    let rawdata = fs.readFileSync(output);
-    let result = JSON.parse(rawdata);
     console.log(JSON.stringify(result, null, 2));
     console.log("::endgroup::")
 
