@@ -10,8 +10,6 @@ jobs:
       result: ${{ steps.horusec.outputs.result }}
     steps:
       - uses: actions/checkout@v2
-        with:
-          submodules: true
 
       - uses: ./
         id: horusec
@@ -24,6 +22,8 @@ jobs:
     needs: [horusec]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
       - uses: reviewdog/action-setup@v1
 
       - run: echo $HORUSEC_OUTPUT | reviewdog -f=rdjson -reporter=github-pr-review
