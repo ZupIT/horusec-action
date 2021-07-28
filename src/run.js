@@ -4,6 +4,8 @@ const {promisify} = require('util');
 const fs = require('fs');
 const subprocesses = require('child_process');
 const exec = promisify(subprocesses.exec)
+const exists = promisify(fs.exists)
+const read = promisify(fs.readFile)
 
 const download = require('./download');
 const reviewdog = require('./reviewdog');
@@ -85,21 +87,18 @@ async function run() {
     if (logLevel) flags.push(`--log-level="${logLevel}"`)
 
     const output = './result.json'
-    await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
-
-    const rawdata = fs.readFileSync(output);
-    let result = JSON.parse(rawdata);
-    if (core.getInput('output-format') === 'reviewdog') {
-        result = reviewdog.convert(result)
-        fs.writeFileSync(output, result);
+    try {
+        await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
+    } catch (err) {
+        core.setFailed(err.message)
     }
 
-    // Output prettified JSON.
-    console.log("::group::Output JSON")
-    console.log(JSON.stringify(result, null, 2));
-    console.log("::endgroup::")
-
-    return result;
+    if (await exists(output)) {
+        const raw = await read(output);
+        const result = JSON.parse(raw);
+        if (core.getInput('output-format') === 'reviewdog') return reviewdog.convert(result)
+        return result;
+    }
 }
 
 run()
