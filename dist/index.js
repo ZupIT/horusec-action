@@ -6176,6 +6176,57 @@ module.exports = async function () {
 
 /***/ }),
 
+/***/ 564:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const core = __nccwpck_require__(186);
+const flags = [
+    "analysis-timeout",
+    "authorization",
+    "certificate-path",
+    "config-file-path",
+    "container-bind-project-path",
+    "custom-rules-path",
+    "disable-docker",
+    "enable-commit-author",
+    "enable-git-history",
+    "false-positive",
+    "filter-path",
+    "headers",
+    "horusec-url",
+    "ignore",
+    "ignore-severity",
+    "information-severity",
+    "insecure-skip-verify",
+    "log-level",
+    "monitor-retry-count",
+    "project-path",
+    "repository-name",
+    "request-timeout",
+    "return-error",
+    "risk-accept",
+    "tools-ignore",
+]
+
+module.exports = class Flags {
+    constructor() {
+        this.flags = []
+        for (let flag of flags) {
+            const value = core.getInput(flag);
+            if (value) this.flags.push(`--${flag}="${value}"`)
+        }
+    }
+
+    toString() {
+        return this.flags.join(' ');
+    }
+}
+
+/***/ }),
+
 /***/ 833:
 /***/ ((module) => {
 
@@ -6380,86 +6431,14 @@ const read = promisify(fs.readFile)
 
 const download = __nccwpck_require__(96);
 const reviewdog = __nccwpck_require__(833);
+const Flags = __nccwpck_require__(564);
 
 async function run() {
     const executable = await download()
-    const flags = [`-p="${core.getInput('project-path')}"`]
-
-    const analysisTimeout = core.getInput('analysis-timeout');
-    if (analysisTimeout) flags.push(`-t="${analysisTimeout}"`)
-
-    const authorization = core.getInput('authorization');
-    if (authorization) flags.push(`-a="${authorization}"`)
-
-    const certificatePath = core.getInput('certificate-path');
-    if (certificatePath) flags.push(`-C="${certificatePath}"`)
-
-    const containerBindProjectPath = core.getInput('container-bind-project-path');
-    if (containerBindProjectPath) flags.push(`-P="${containerBindProjectPath}"`)
-
-    const customRulesPath = core.getInput('custom-rules-path');
-    if (customRulesPath) flags.push(`-c="${customRulesPath}"`)
-
-    const disableDocker = core.getInput('disable-docker');
-    if (disableDocker) flags.push(`-D="${disableDocker}"`)
-
-    const enableCommitAuthor = core.getInput('enable-commit-author');
-    if (enableCommitAuthor) flags.push(`-G="${enableCommitAuthor}"`)
-
-    const enableGitHistory = core.getInput('enable-git-history');
-    if (enableGitHistory) flags.push(`--enable-git-history="${enableGitHistory}"`)
-
-    const falsePositive = core.getInput('false-positive');
-    if (falsePositive) flags.push(`-F="${falsePositive}"`)
-
-    const filterPath = core.getInput('filter-path');
-    if (filterPath) flags.push(`-f="${filterPath}"`)
-
-    const headers = core.getInput('headers');
-    if (headers) flags.push(`-headers="${headers}"`)
-
-    const horusecUrl = core.getInput('horusec-url');
-    if (horusecUrl) flags.push(`-u="${horusecUrl}"`)
-
-    const ignore = core.getInput('ignore');
-    if (ignore) flags.push(`-i="${ignore}"`)
-
-    const ignoreSeverity = core.getInput('ignore-severity');
-    if (ignoreSeverity) flags.push(`-s="${ignoreSeverity}"`)
-
-    const informationSeverity = core.getInput('information-severity');
-    if (informationSeverity) flags.push(`-I="${informationSeverity}"`)
-
-    const insecureSkipVerify = core.getInput('insecure-skip-verify');
-    if (insecureSkipVerify) flags.push(`-S="${insecureSkipVerify}"`)
-
-    const monitorRetryCount = core.getInput('monitor-retry-count');
-    if (monitorRetryCount) flags.push(`-m="${monitorRetryCount}"`)
-
-    const repositoryName = core.getInput('repository-name');
-    if (repositoryName) flags.push(`-n="${repositoryName}"`)
-
-    const requestTimeout = core.getInput('request-timeout');
-    if (requestTimeout) flags.push(`-r="${requestTimeout}"`)
-
-    const returnError = core.getInput('return-error');
-    if (returnError) flags.push(`-e="${returnError}"`)
-
-    const riskAccept = core.getInput('risk-accept');
-    if (riskAccept) flags.push(`-R="${riskAccept}"`)
-
-    const toolsIgnore = core.getInput('tools-ignore');
-    if (toolsIgnore) flags.push(`-T="${toolsIgnore}"`)
-
-    const configFilePath = core.getInput('config-file-path');
-    if (configFilePath) flags.push(`--config-file-path="${configFilePath}"`)
-
-    const logLevel = core.getInput('log-level');
-    if (logLevel) flags.push(`--log-level="${logLevel}"`)
-
+    const flags = new Flags()
     const output = './result.json'
     try {
-        await exec(`${executable} start ${flags.join(' ')} --json-output-file="${output}" --output-format="json"`)
+        await exec(`${executable} start ${flags} --json-output-file="${output}" --output-format="json"`)
     } catch (err) {
         core.setFailed(err.message)
     }
