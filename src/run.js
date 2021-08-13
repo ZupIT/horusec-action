@@ -24,6 +24,9 @@ async function run() {
     if (await exists(output)) {
         const raw = await read(output);
         const result = JSON.parse(raw);
+        core.group('result', function () {
+            core.info(result)
+        })
         if (core.getInput('output-format') === 'reviewdog') return reviewdog.convert(result)
         return result;
     }
