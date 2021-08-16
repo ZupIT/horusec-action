@@ -1,4 +1,5 @@
 function convert({analysisVulnerabilities: analysis}) {
+    analysis = analysis ? analysis : []
     const diagnostics = analysis
         .map(({vulnerabilities}) => vulnerabilities)
         .flat()
