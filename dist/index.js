@@ -6231,6 +6231,7 @@ module.exports = class Flags {
 /***/ ((module) => {
 
 function convert({analysisVulnerabilities: analysis}) {
+    analysis = analysis ? analysis : []
     const diagnostics = analysis
         .map(({vulnerabilities}) => vulnerabilities)
         .flat()
@@ -6446,6 +6447,15 @@ async function run() {
     if (await exists(output)) {
         const raw = await read(output);
         const result = JSON.parse(raw);
+        const {analysisVulnerabilities: analysis} = result
+        if (analysis) {
+            core.group('vulnerabilities', function () {
+                analysis.map(({vulnerabilities}) => vulnerabilities)
+                    .flat()
+                    .filter(({file}) => file)
+                    .forEach(({details, file, line, column}) => core.error(`${file}:${line}:${column}: ${details}`))
+            })
+        }
         if (core.getInput('output-format') === 'reviewdog') return reviewdog.convert(result)
         return result;
     }
